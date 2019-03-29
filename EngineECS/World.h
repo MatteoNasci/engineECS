@@ -15,6 +15,22 @@ namespace engineECS {
 
 		void DestroyEntity(const Entity& InEntity);
 
+		void ForEachAll(const std::function<void(const Entity& InEntity)>& Callback);
+
+		template<typename... Components>
+		void ForEach(const std::function<void(const Entity& InEntity)>& Callback)
+		{
+			std::bitset<MAX_COMPONENTS> Mask = 0;
+			[&Mask](...) {}(Mask.set(Components::GetTypeId(), true)...);
+			for (unsigned int i = 0; i < Entities.size(); i++)
+			{
+				if ((Entities[i].Mask & Mask) == Mask)
+				{
+					Callback(Entity(*this, i));
+				}
+			}
+		}
+
 		template<typename T>
 		T& AddComponent(const Entity& InEntity)
 		{
@@ -34,31 +50,6 @@ namespace engineECS {
 		{
 			std::vector<T>& ComponentVector = T::GetVector();
 			return ComponentVector[InEntity.Id];
-		}
-
-		void ForEachAll(const std::function<void(const Entity& InEntity)>& Callback)
-		{
-			for (unsigned int i = 0; i < Entities.size(); i++)
-			{
-				if ((Entities[i].Mask.any()))
-				{
-					Callback(Entity(*this, i));
-				}
-			}
-		}
-
-		template<typename... Components>
-		void ForEach(const std::function<void(const Entity& InEntity)>& Callback)
-		{
-			std::bitset<MAX_COMPONENTS> Mask = 0;
-			[&Mask](...) {}(Mask.set(Components::GetTypeId(), true)...);
-			for (unsigned int i = 0; i < Entities.size(); i++)
-			{
-				if ((Entities[i].Mask & Mask) == Mask)
-				{
-					Callback(Entity(*this, i));
-				}
-			}
 		}
 
 	private:

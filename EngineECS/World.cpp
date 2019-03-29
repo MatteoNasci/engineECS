@@ -20,3 +20,14 @@ void engineECS::World::DestroyEntity(const engineECS::Entity& InEntity)
 	Recycler.push(InEntity.Id);
 	Entities[InEntity.Id].Mask.reset();
 }
+
+void engineECS::World::ForEachAll(const std::function<void(const engineECS::Entity& InEntity)>& Callback)
+{
+	for (unsigned int i = 0; i < Entities.size(); i++)
+	{
+		if ((Entities[i].Mask.any()))
+		{
+			Callback(Entity(*this, i));
+		}
+	}
+}

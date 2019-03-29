@@ -7,8 +7,8 @@ int main(int argc, char **argv)
 {
 	engineECS::World world;
 
-	engineECS::Entity player = world.CreateEntity();
 	engineECS::Entity enemy001 = world.CreateEntity();
+	engineECS::Entity player = world.CreateEntity();
 	engineECS::Entity enemy002 = world.CreateEntity();
 
 	player.AddComponent<engineECS::RendererComponent>();
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	world.DestroyEntity(player);
 
 	world.ForEachAll([](const engineECS::Entity& InEntity) {
-		std::printf("ciao\n");
+		std::printf("Hello from %d entity!\n", InEntity.Id);
 	});
 
 	std::getchar();
