@@ -7,7 +7,7 @@ namespace engineECS {
 	class Entity
 	{
 	private:
-		Entity(const World& InWorld, unsigned int InId) : Id(InId), World(InWorld) {}
+		Entity(World& InWorld, unsigned int InId) : Id(InId), World(InWorld) {}
 
 	public:
 		const unsigned int Id;
@@ -24,7 +24,7 @@ namespace engineECS {
 			return World.GetComponent<T>(*this);
 		}
 
-		const World& World;
+		World& World;
 		friend class World;
 	};
 }

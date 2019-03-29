@@ -16,7 +16,7 @@ namespace engineECS {
 		void DestroyEntity(const Entity& InEntity);
 
 		template<typename T>
-		T& AddComponent(const Entity& InEntity) const
+		T& AddComponent(const Entity& InEntity)
 		{
 			std::vector<T>& ComponentVector = T::GetVector();
 			if (InEntity.Id >= ComponentVector.size())
@@ -36,7 +36,7 @@ namespace engineECS {
 			return ComponentVector[InEntity.Id];
 		}
 
-		void ForEachAll(const std::function<void(const Entity& InEntity)>& Callback) const
+		void ForEachAll(const std::function<void(const Entity& InEntity)>& Callback)
 		{
 			for (unsigned int i = 0; i < Entities.size(); i++)
 			{
@@ -48,7 +48,7 @@ namespace engineECS {
 		}
 
 		template<typename... Components>
-		void ForEach(const std::function<void(const Entity& InEntity)>& Callback) const
+		void ForEach(const std::function<void(const Entity& InEntity)>& Callback)
 		{
 			std::bitset<MAX_COMPONENTS> Mask = 0;
 			[&Mask](...) {}(Mask.set(Components::GetTypeId(), true)...);
