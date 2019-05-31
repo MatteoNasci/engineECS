@@ -1,7 +1,5 @@
 #include "World.h"
 
-#include <functional>
-
 #include "Engine.h"
 
 engineECS::Entity engineECS::World::createEntity()
@@ -53,16 +51,24 @@ engineECS::World::~World()
 {
 	deinitialize();
 }
+size_t engineECS::World::getMaxSystems() const
+{
+	return engineECS::World::MaxSystems;
+}
 void engineECS::World::executeSystems()
-{ //TODO
-	//for (size_t i = 0; i < Systems.size(); i++)
-	//{
-	//	//Systems[i](engine, *this);
-	//}
+{ 
+	for (size_t i = 0; i < getMaxSystems(); ++i)
+	{
+		const auto& callback = systems[i].getCallback();
+		if (callback)
+		{
+			//forEach()
+		}
+	}
 }
 void engineECS::World::forEachAll(const SYSTEM_FUNCTION& callback)
 {
-	for (unsigned int i = 0; i < entities.size(); i++)
+	for (size_t i = 0; i < entities.size(); ++i)
 	{
 		if ((entities[i].mask.any()))
 		{

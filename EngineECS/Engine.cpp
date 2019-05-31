@@ -1,7 +1,5 @@
 #include "Engine.h"
 
-#include "World.h"
-
 engineECS::Engine& engineECS::Engine::getEngine()
 {
 	//TODO: test if this can be made inline

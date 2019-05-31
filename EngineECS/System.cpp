@@ -1,7 +1,7 @@
 
 #include "System.h"
 
-engineECS::System::System(const std::function<void(const engineECS::Entity& inEntity)>& inCallback) : callback(inCallback)
+engineECS::System::System(const SYSTEM_FUNCTION& inCallback) : callback(inCallback)
 {
 	//auto a = std::bind(&System::Execute, *this, std::placeholders::_1);
 	//std::function<void(engineECS::Engine& engine, engineECS::World& world)> b = a;

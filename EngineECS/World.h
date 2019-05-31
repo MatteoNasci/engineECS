@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 #include <queue>
+#include <bitset>
 
 #include "private.h"
 #include "EntityComponentMask.h"
@@ -64,15 +65,17 @@ namespace engineECS
 		void executeSystems();
 		WorldIndex getWorldIndex() const;
 		bool isActive() const;
+		size_t getMaxSystems() const;
 
 		friend Engine;
+
 	private:
 		std::vector<EntityComponentMask> entities;
 		std::queue<size_t> entitiesRecycler;
 
-		SYSTEM_FUNCTION systems[MaxSystems];
+		System systems[MaxSystems];
 		std::queue<size_t> systemsRecycler;
-
+		
 		World();
 		~World();
 

@@ -7,15 +7,15 @@
 
 namespace engineECS
 {
-	class System final
+	struct System final
 	{
 	public:
-		const std::function<void(const engineECS::Entity& inEntity)>& getCallback() const;
+		const SYSTEM_FUNCTION& getCallback() const;
 
-		System(const std::function<void(const engineECS::Entity& inEntity)>& inCallback);
+		System(const SYSTEM_FUNCTION& inCallback);
 		~System();
 	private:
-		const std::function<void(const engineECS::Entity& inEntity)>& callback;
+		const SYSTEM_FUNCTION& callback;
 
 	};
 }
