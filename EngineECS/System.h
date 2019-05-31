@@ -13,6 +13,7 @@ namespace engineECS
 		const SYSTEM_FUNCTION& getCallback() const;
 
 		System(const SYSTEM_FUNCTION& inCallback);
+		System();
 		~System();
 	private:
 		const SYSTEM_FUNCTION& callback;
