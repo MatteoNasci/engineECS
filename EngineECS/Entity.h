@@ -2,30 +2,32 @@
 
 #include "private.h"
 
-namespace engineECS {
+namespace engineECS 
+{
 	class World;
-	class Entity
+
+	struct Entity final
 	{
-	private:
-		Entity(World& InWorld, unsigned int InId) : Id(InId), World(InWorld) {}
-
 	public:
-		const unsigned int Id;
+		const TypeId id;
 
 		template<typename T>
-		T& AddComponent()
+		T& addComponent()
 		{
-			return World.AddComponent<T>(*this);
+			return GET_CURRENT_WORLD->addComponent<T>(*this);
 		}
 
 		template<typename T>
-		T& GetComponent() const
+		T& getComponent() const
 		{
-			return World.GetComponent<T>(*this);
+			return GET_CURRENT_WORLD->getComponent<T>(*this);
 		}
 
-		World& World;
-		friend class World;
+
+		friend World;
+	private:
+		Entity(const TypeId inId) : id(inId) {}
+
 	};
 }
 

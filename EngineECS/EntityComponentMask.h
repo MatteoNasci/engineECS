@@ -1,9 +1,12 @@
 #pragma once
+
 #include <bitset>
-namespace engineECS {
-#define MAX_COMPONENTS 256
-	struct EntityComponentMask
+
+namespace engineECS
+{
+	struct EntityComponentMask final
 	{
-		std::bitset<MAX_COMPONENTS> Mask;
+		static constexpr size_t MaxComponents = 256;
+		std::bitset<MaxComponents> mask;
 	};
 }

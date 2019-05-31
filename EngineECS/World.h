@@ -4,58 +4,83 @@
 #include <vector>
 #include <queue>
 
+#include "private.h"
 #include "EntityComponentMask.h"
 #include "Entity.h"
-namespace engineECS {
+#include "System.h"
 
-	class World
+namespace engineECS 
+{
+	class Engine;
+
+	class World final
 	{
 	public:
-		Entity CreateEntity();
+		static constexpr size_t MaxSystems = 256;
 
-		void DestroyEntity(const Entity& InEntity);
+		Entity createEntity();
 
-		void ForEachAll(const std::function<void(const Entity& InEntity)>& Callback);
+		void destroyEntity(const Entity& inEntity);
+
+		void forEachAll(const SYSTEM_FUNCTION& callback);
 
 		template<typename... Components>
-		void ForEach(const std::function<void(const Entity& InEntity)>& Callback)
+		void forEach(const SYSTEM_FUNCTION& callback)
 		{
-			std::bitset<MAX_COMPONENTS> Mask = 0;
-			[&Mask](...) {}(Mask.set(Components::GetTypeId(), true)...);
-			for (unsigned int i = 0; i < Entities.size(); i++)
+			std::bitset<engineECS::EntityComponentMask::MaxComponents> mask = 0;
+			[&mask](...) {}(mask.set(Components::getTypeId(), true)...);
+			for (size_t i = 0; i < entities.size(); ++i)
 			{
-				if ((Entities[i].Mask & Mask) == Mask)
+				if ((entities[i].mask & mask) == mask)
 				{
-					Callback(Entity(*this, i));
+					callback(Entity(*this, i));
 				}
 			}
 		}
 
 		template<typename T>
-		T& AddComponent(const Entity& InEntity)
+		T& addComponent(const Entity& inEntity)
 		{
-			std::vector<T>& ComponentVector = T::GetVector();
-			if (InEntity.Id >= ComponentVector.size())
+			std::vector<T>& componentVector = T::getVector();
+			if (inEntity.id >= componentVector.size())
 			{
-				ComponentVector.resize(InEntity.Id + 1);
+				componentVector.resize(inEntity.id + 1);
 			}
-			ComponentVector[InEntity.Id] = {};
-			size_t id = T::GetTypeId();
-			Entities[InEntity.Id].Mask.set(id, true);
-			return ComponentVector[InEntity.Id];
+			componentVector[inEntity.id] = {};
+			size_t id = T::getTypeId();
+			entities[inEntity.id].mask.set(id, true);
+			return componentVector[inEntity.id];
 		}
 
 		template<typename T>
-		T& GetComponent(const Entity& InEntity) const
+		T& getComponent(const Entity& inEntity) const
 		{
-			std::vector<T>& ComponentVector = T::GetVector();
-			return ComponentVector[InEntity.Id];
+			std::vector<T>& componentVector = T::getVector();
+			return componentVector[inEntity.id];
 		}
 
-	private:
-		std::vector<EntityComponentMask> Entities;
+		void addSystem(const System& inSystem);
 
-		std::queue<unsigned int> Recycler;
+		void executeSystems();
+		WorldIndex getWorldIndex() const;
+		bool isActive() const;
+
+		friend Engine;
+	private:
+		std::vector<EntityComponentMask> entities;
+		std::queue<size_t> entitiesRecycler;
+
+		SYSTEM_FUNCTION systems[MaxSystems];
+		std::queue<size_t> systemsRecycler;
+
+		World();
+		~World();
+
+		WorldIndex ownIndex;
+
+		void initialize(const WorldIndex ownIndex);
+		void deinitialize();
+
 	};
 }
 

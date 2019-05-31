@@ -1,33 +1,72 @@
 #include "World.h"
 
-engineECS::Entity engineECS::World::CreateEntity() {
-	unsigned int Id = 0;
-	if (Recycler.empty())
+#include <functional>
+
+#include "Engine.h"
+
+engineECS::Entity engineECS::World::createEntity()
+{
+	size_t id = 0;
+	if (entitiesRecycler.empty())
 	{
-		Entities.push_back(EntityComponentMask());
-		Id = static_cast<unsigned int>(Entities.size()) - 1;
+		entities.push_back(EntityComponentMask());
+		id = entities.size() - 1;
 	}
 	else
 	{
-		Id = Recycler.front();
-		Recycler.pop();
+		id = entitiesRecycler.front();
+		entitiesRecycler.pop();
 	}
-	return Entity(*this, Id);
+	return Entity(id);
 }
-
-void engineECS::World::DestroyEntity(const engineECS::Entity& InEntity)
+void engineECS::World::initialize(const WorldIndex inOwnIndex)
 {
-	Recycler.push(InEntity.Id);
-	Entities[InEntity.Id].Mask.reset();
+	ownIndex = inOwnIndex;
 }
-
-void engineECS::World::ForEachAll(const std::function<void(const engineECS::Entity& InEntity)>& Callback)
+void engineECS::World::deinitialize()
 {
-	for (unsigned int i = 0; i < Entities.size(); i++)
+	ownIndex = engineECS::Engine::getInvalidWorldIndex();
+}
+WorldIndex engineECS::World::getWorldIndex() const
+{
+	return ownIndex;
+}
+void engineECS::World::addSystem(const System& inSystem)
+{
+	//TODO
+	//Systems.push_back(InSystem);
+}
+void engineECS::World::destroyEntity(const engineECS::Entity& inEntity)
+{
+	entitiesRecycler.push(inEntity.id);
+	entities[inEntity.id].mask.reset();
+}
+bool engineECS::World::isActive() const
+{
+	return ownIndex != engineECS::Engine::getInvalidWorldIndex();
+}
+engineECS::World::World()
+{
+	deinitialize();
+}
+engineECS::World::~World()
+{
+	deinitialize();
+}
+void engineECS::World::executeSystems()
+{ //TODO
+	//for (size_t i = 0; i < Systems.size(); i++)
+	//{
+	//	//Systems[i](engine, *this);
+	//}
+}
+void engineECS::World::forEachAll(const SYSTEM_FUNCTION& callback)
+{
+	for (unsigned int i = 0; i < entities.size(); i++)
 	{
-		if ((Entities[i].Mask.any()))
+		if ((entities[i].mask.any()))
 		{
-			Callback(Entity(*this, i));
+			callback(Entity(i));
 		}
 	}
 }

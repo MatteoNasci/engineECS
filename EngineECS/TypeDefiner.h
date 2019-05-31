@@ -1,8 +1,11 @@
 #pragma once
+
 #include "private.h"
-namespace engineECS {
-	struct TypeDefiner
+
+namespace engineECS 
+{
+	struct TypeDefiner final
 	{
-		static TypeId _TypeIdCounter;
+		static TypeId _typeIdCounter;
 	};
 }

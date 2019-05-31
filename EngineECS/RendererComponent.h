@@ -1,6 +1,10 @@
 #pragma once
+
+#include "private.h"
 #include "Component.h"
-namespace engineECS {
+
+namespace engineECS 
+{
 	class RendererComponent :
 		public Component<RendererComponent>
 	{

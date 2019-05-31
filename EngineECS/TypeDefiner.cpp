@@ -1,3 +1,4 @@
 #include "TypeDefiner.h"
-TypeId engineECS::TypeDefiner::_TypeIdCounter = 0;
+
+TypeId engineECS::TypeDefiner::_typeIdCounter = 0;
 
