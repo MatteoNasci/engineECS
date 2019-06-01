@@ -2,46 +2,75 @@
 
 #include "Engine.h"
 
-engineECS::Entity engineECS::World::createEntity()
+engineECS::Entity engineECS::World::createEntity(engineECS::EntityCreation& outResult)
 {
-	size_t id = 0;
 	if (entitiesRecycler.empty())
 	{
-		entities.push_back(EntityComponentMask());
-		id = entities.size() - 1;
+		outResult = engineECS::EntityCreation::EC_ENTITY_LIMIT;
+		return Entity(engineECS::InvalidEntityIndex);
 	}
-	else
-	{
-		id = entitiesRecycler.front();
-		entitiesRecycler.pop();
-	}
+	int id = entitiesRecycler.front();
+	entitiesRecycler.pop();
 	return Entity(id);
 }
 void engineECS::World::initialize(const WorldIndex inOwnIndex)
 {
 	ownIndex = inOwnIndex;
+	std::memset(systems, 0, sizeof(engineECS::System) * engineECS::MaxSystems);
+	for (int i = 0; i < engineECS::MaxSystems; ++i)
+	{
+		systemsRecycler.push(i);
+	}
+	std::memset(entities, 0, sizeof(engineECS::EntityComponentMask) * engineECS::MaxEntities);
+	for (int i = 0; i < engineECS::MaxEntities; ++i)
+	{
+		entitiesRecycler.push(i);
+	}
 }
 void engineECS::World::deinitialize()
 {
-	ownIndex = engineECS::Engine::getInvalidWorldIndex();
+	ownIndex = engineECS::InvalidWorldIndex;
 }
 WorldIndex engineECS::World::getWorldIndex() const
 {
 	return ownIndex;
 }
-void engineECS::World::addSystem(const System& inSystem)
+bool engineECS::World::tryAddSystem(const System& inSystem)
 {
-	//TODO
-	//Systems.push_back(InSystem);
+	if (systemsRecycler.empty())
+	{
+		return false;
+	}
+
+	int index = systemsRecycler.front();
+	systemsRecycler.pop();
+	systems[index] = inSystem;
+	return true;
+}
+bool engineECS::World::tryAddSystem(System&& inSystem)
+{
+	if (systemsRecycler.empty())
+	{
+		return false;
+	}
+
+	int index = systemsRecycler.front();
+	systemsRecycler.pop();
+	systems[index] = inSystem;
+	return true;
 }
 void engineECS::World::destroyEntity(const engineECS::Entity& inEntity)
 {
+	if (inEntity.id == engineECS::InvalidEntityIndex)
+	{
+		return;
+	}
 	entitiesRecycler.push(inEntity.id);
 	entities[inEntity.id].mask.reset();
 }
 bool engineECS::World::isActive() const
 {
-	return ownIndex != engineECS::Engine::getInvalidWorldIndex();
+	return ownIndex != engineECS::InvalidWorldIndex;
 }
 engineECS::World::World()
 {
@@ -51,28 +80,39 @@ engineECS::World::~World()
 {
 	deinitialize();
 }
-size_t engineECS::World::getMaxSystems() const
+void engineECS::World::executeSystems(const float deltaTime)
 {
-	return engineECS::World::MaxSystems;
-}
-void engineECS::World::executeSystems()
-{ 
-	for (size_t i = 0; i < getMaxSystems(); ++i)
+	for (int i = 0; i < engineECS::MaxSystems; ++i)
 	{
-		const auto& callback = systems[i].getCallback();
-		if (callback)
-		{
-			//forEach()
-		}
+		forEach(systems[i], deltaTime);
 	}
 }
-void engineECS::World::forEachAll(const SYSTEM_FUNCTION& callback)
+void engineECS::World::forEachAll(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& callback, const float deltaTime)
 {
-	for (size_t i = 0; i < entities.size(); ++i)
+	for (int i = 0; i < engineECS::MaxEntities; ++i)
 	{
 		if ((entities[i].mask.any()))
 		{
-			callback(Entity(i));
+			callback(Entity(i), deltaTime);
 		}
 	}
+}
+void engineECS::World::forEach(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& callback, const engineECS::EntityComponentMask& mask, const float deltaTime)
+{
+	if (!callback || mask.mask.none())
+	{
+		return;
+	}
+
+	for (int i = 0; i < engineECS::MaxEntities; ++i)
+	{
+		if ((entities[i].mask & mask.mask) == mask.mask)
+		{
+			callback(Entity(i), deltaTime);
+		}
+	}
+}
+void engineECS::World::forEach(const engineECS::System& system, const float deltaTime)
+{
+	forEach(system.getCallback(), system.getMask(), deltaTime);
 }

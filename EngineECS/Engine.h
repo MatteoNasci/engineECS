@@ -2,6 +2,7 @@
 #include <queue>
 
 #include "private.h"
+#include "constants.h"
 #include "World.h"
 
 namespace engineECS
@@ -15,24 +16,21 @@ namespace engineECS
 	class Engine
 	{
 	public:
-		static constexpr size_t MaxWorlds = 10;
-		static constexpr size_t InvalidWorldIndex = MaxWorlds + 1;
-
 		Engine(const Engine&) = delete;
 		void operator=(const Engine&) = delete;
 
 		static Engine& getEngine();
-		static WorldIndex getInvalidWorldIndex();
 
 		WorldIndex createWorld(WorldCreation& outResult);
 		bool tryDestroyWorld(const WorldIndex index);
 
+		void run(const float deltaTime);
+
 		World* getWorld(const WorldIndex index);
 		World* getCurrentWorld();
 		WorldIndex getCurrentWorldIndex() const;
-		size_t getActiveWorldsCount() const;
-		size_t getMaxWorldsCount() const;
-		size_t getAvailableWorldsCount() const;
+		int getActiveWorldsCount() const;
+		int getAvailableWorldsCount() const;
 	private:
 		Engine();
 		~Engine();

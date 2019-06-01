@@ -9,72 +9,79 @@
 #include "EntityComponentMask.h"
 #include "Entity.h"
 #include "System.h"
+#include "constants.h"
 
 namespace engineECS 
 {
 	class Engine;
 
+	typedef enum EntityCreation
+	{
+		EC_OK = 0,
+		EC_ENTITY_LIMIT,
+	}EntityCreation ;
+
 	class World final
 	{
 	public:
-		static constexpr size_t MaxSystems = 256;
 
-		Entity createEntity();
+
+		Entity createEntity(EntityCreation& outResult);
 
 		void destroyEntity(const Entity& inEntity);
 
-		void forEachAll(const SYSTEM_FUNCTION& callback);
+		void forEachAll(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& callback, const float deltaTime);
+
+		void forEach(const System& system, const float deltaTime);
+
 
 		template<typename... Components>
-		void forEach(const SYSTEM_FUNCTION& callback)
+		void forEach(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& callback, const float deltaTime)
 		{
-			std::bitset<engineECS::EntityComponentMask::MaxComponents> mask = 0;
-			[&mask](...) {}(mask.set(Components::getTypeId(), true)...);
-			for (size_t i = 0; i < entities.size(); ++i)
-			{
-				if ((entities[i].mask & mask) == mask)
-				{
-					callback(Entity(*this, i));
-				}
-			}
+			EntityComponentMask mask{};
+			[&mask](...) {}(mask.mask.set(Components::getTypeId(), true)...);
+			forEach(callback, mask, deltaTime);
 		}
 
 		template<typename T>
-		T& addComponent(const Entity& inEntity)
+		bool tryAddComponent(const Entity& inEntity)
 		{
-			std::vector<T>& componentVector = T::getVector();
-			if (inEntity.id >= componentVector.size())
+			if (inEntity.id >= T::getLength())
 			{
-				componentVector.resize(inEntity.id + 1);
+				return false;
 			}
-			componentVector[inEntity.id] = {};
-			size_t id = T::getTypeId();
+
+			T::getElement(inEntity.id) = {};
+
+			int id = T::getTypeId();
 			entities[inEntity.id].mask.set(id, true);
-			return componentVector[inEntity.id];
+
+			return true;
 		}
 
 		template<typename T>
 		T& getComponent(const Entity& inEntity) const
 		{
-			std::vector<T>& componentVector = T::getVector();
-			return componentVector[inEntity.id];
+			return T::getElement(inEntity.id);
 		}
 
-		void addSystem(const System& inSystem);
+		bool tryAddSystem(const System& inSystem);
+		bool tryAddSystem(System&& inSystem);
 
-		void executeSystems();
+		void executeSystems(const float deltaTime);
 		WorldIndex getWorldIndex() const;
 		bool isActive() const;
-		size_t getMaxSystems() const;
 
 		friend Engine;
 
 	private:
-		std::vector<EntityComponentMask> entities;
-		std::queue<size_t> entitiesRecycler;
+		void forEach(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& callback, const EntityComponentMask& mask, const float deltaTime);
+
+		EntityComponentMask entities[MaxEntities];
+		std::queue<int> entitiesRecycler;
 
 		System systems[MaxSystems];
-		std::queue<size_t> systemsRecycler;
+		std::queue<int> systemsRecycler;
 		
 		World();
 		~World();

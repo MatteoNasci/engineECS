@@ -12,9 +12,9 @@ namespace engineECS
 		const TypeId id;
 
 		template<typename T>
-		T& addComponent()
+		bool tryAddComponent()
 		{
-			return GET_CURRENT_WORLD->addComponent<T>(*this);
+			return GET_CURRENT_WORLD->tryAddComponent<T>(*this);
 		}
 
 		template<typename T>

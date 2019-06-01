@@ -3,30 +3,55 @@
 
 #include "private.h"
 #include "TypeDefiner.h"
+#include "constants.h"
 
-namespace engineECS 
+#define CALCULATE_LENGTH(desiredSize) ((desiredSize < 0 || desiredSize > MaxEntities) ? MaxEntities : desiredSize)
+
+namespace engineECS
 {
-	template<typename T>
+	template<typename T, int componentMaxCount>
 	class Component
 	{
 	public:
+
+		static int getLength()
+		{
+			static constexpr int length = CALCULATE_LENGTH(componentMaxCount);
+			return length;
+		}
 		static TypeId getTypeId()
 		{
 			static TypeId internalTypeId = TypeDefiner::_typeIdCounter++;
 			return internalTypeId;
 		}
 
-		static std::vector<T>& getVector()
+		static T& getElement(const int index)
 		{
-			static std::vector<T> vector;
-			return vector;
+			return getElements()[index];
+		}
+
+		static bool tryGetElement(const int index, T& outElement)
+		{
+			if (index >= getLength())
+			{
+				return false;
+			}
+
+			outElement = getElement(index);
+			return true;
+		}
+
+		static T* getElements()
+		{
+			static T elements[CALCULATE_LENGTH(componentMaxCount)];
+			return elements;
 		}
 	protected:
-		Component(const Component&) = default;               // Copy constructor
-		Component(Component&&) = default;                    // Move constructor
-		Component& operator=(const Component&) = default;  // Copy assignment operator
-		Component& operator=(Component&&) = default;       // Move assignment operator
-		~Component() = default;                 // Destructor
+		Component(const Component&) = default;              
+		Component(Component&&) = default;                   
+		Component& operator=(const Component&) = default; 
+		Component& operator=(Component&&) = default;       
+		~Component() = default;                 
 		Component() = default;
 	};
 }

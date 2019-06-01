@@ -1,29 +1,36 @@
 #include "Engine.h"
 
+void engineECS::Engine::run(const float deltaTime)
+{
+	for (currentWorldIndex = 0; currentWorldIndex < engineECS::MaxWorlds; ++currentWorldIndex)
+	{
+		World& world = worlds[currentWorldIndex];
+		if (world.isActive())
+		{
+			world.executeSystems(deltaTime);
+		}
+	}
+	currentWorldIndex = engineECS::InvalidWorldIndex;
+}
 engineECS::Engine& engineECS::Engine::getEngine()
 {
-	//TODO: test if this can be made inline
 	static engineECS::Engine singletonEngine;
 	return singletonEngine;
 }
-size_t engineECS::Engine::getActiveWorldsCount() const
+int engineECS::Engine::getActiveWorldsCount() const
 {
-	return getMaxWorldsCount() - recycler.size();
+	return engineECS::MaxWorlds - static_cast<int>(recycler.size());
 }
-size_t engineECS::Engine::getMaxWorldsCount() const
+int engineECS::Engine::getAvailableWorldsCount() const
 {
-	return engineECS::Engine::MaxWorlds;
-}
-size_t engineECS::Engine::getAvailableWorldsCount() const
-{
-	return getMaxWorldsCount() - getActiveWorldsCount();
+	return engineECS::MaxWorlds - getActiveWorldsCount();
 }
 WorldIndex engineECS::Engine::createWorld(WorldCreation& outResult)
 {
 	if (getAvailableWorldsCount() <= 0)
 	{
 		outResult = WC_MAX_WORLD_LIMIT;
-		return getInvalidWorldIndex();
+		return engineECS::InvalidWorldIndex;
 	}
 
 	WorldIndex index = recycler.front();
@@ -36,19 +43,22 @@ WorldIndex engineECS::Engine::createWorld(WorldCreation& outResult)
 }
 engineECS::World* engineECS::Engine::getCurrentWorld()
 {
-	if (currentWorldIndex == engineECS::Engine::InvalidWorldIndex)
+	if (currentWorldIndex == engineECS::InvalidWorldIndex)
 	{
 		return nullptr;
 	}
-	return &worlds[currentWorldIndex];
+
+	World& world = worlds[currentWorldIndex];
+	if (!world.isActive())
+	{
+		return nullptr;
+	}
+
+	return &world;
 }
 WorldIndex engineECS::Engine::getCurrentWorldIndex() const
 {
 	return currentWorldIndex;
-}
-WorldIndex engineECS::Engine::getInvalidWorldIndex()
-{
-	return engineECS::Engine::InvalidWorldIndex;
 }
 engineECS::World* engineECS::Engine::getWorld(const WorldIndex index)
 {
@@ -56,7 +66,7 @@ engineECS::World* engineECS::Engine::getWorld(const WorldIndex index)
 }
 bool engineECS::Engine::tryDestroyWorld(const WorldIndex index)
 {
-	if (index >= getMaxWorldsCount())
+	if (index >= engineECS::MaxWorlds)
 	{
 		return false;
 	}
@@ -73,7 +83,7 @@ bool engineECS::Engine::tryDestroyWorld(const WorldIndex index)
 }
 engineECS::Engine::Engine()
 {
-	for (size_t i = 0; i < getMaxWorldsCount() - 1; i++)
+	for (int i = 0; i < engineECS::MaxWorlds; ++i)
 	{
 		recycler.push(i);
 		worlds[i].deinitialize();
@@ -81,7 +91,7 @@ engineECS::Engine::Engine()
 }
 engineECS::Engine::~Engine()
 {
-	for (size_t i = 0; i < getMaxWorldsCount() - 1; i++)
+	for (int i = 0; i < engineECS::MaxWorlds; ++i)
 	{
 		worlds[i].deinitialize();
 	}

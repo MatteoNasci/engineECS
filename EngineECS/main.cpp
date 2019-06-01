@@ -6,7 +6,7 @@
 #include "lua.hpp"
 #include <iostream>
 /*
-static int lua_test(lua_State* L) 
+static int lua_test(lua_State* L)
 {
 	std::cout << lua_gettop(L) << ", function stack top type: " << luaL_typename(L, -1) << std::endl;
 	return luaL_error(L, "Brutto errore!");
@@ -94,34 +94,56 @@ int main(int argc, char **argv)
 	//destroyed lua VM
 	lua_close(L);
 	*/
-	engineECS::WorldCreation creationResult;
-	WorldIndex index = GET_ENGINE.createWorld(creationResult);
-
-	if (creationResult != engineECS::WorldCreation::WC_OK)
 	{
-		//error
+		engineECS::WorldCreation creationResult;
+		WorldIndex index = GET_ENGINE.createWorld(creationResult);
+
+		if (creationResult != engineECS::WorldCreation::WC_OK)
+		{
+			//error
+		}
+		engineECS::World* world = GET_ENGINE.getWorld(index);
+
+		std::cout << sizeof(std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>) << std::endl;
+
+		engineECS::EntityCreation result;
+		engineECS::Entity enemy001 = world->createEntity(result);
+		engineECS::Entity player = world->createEntity(result);
+		engineECS::Entity enemy002 = world->createEntity(result);
+
+		player.tryAddComponent<engineECS::RendererComponent>();
+		enemy001.tryAddComponent<engineECS::RendererComponent>();
+		enemy002.tryAddComponent<engineECS::RendererComponent>();
+
+		player.tryAddComponent<engineECS::TransformComponent>();
+		enemy001.tryAddComponent<engineECS::TransformComponent>();
+
+		enemy002.tryAddComponent<engineECS::TransformComponent>();
+		enemy002.getComponent<engineECS::TransformComponent>().rotation = engineECS::Vector3(0.2f, 10.0f, -55.3f);
+
+		enemy002.tryAddComponent<engineECS::RotatorComponent>();
+		enemy002.getComponent<engineECS::RotatorComponent>().rotationSpeed = engineECS::Vector3(5, 1, 100);
+
+		world->destroyEntity(player);
+
+		//world->tryAddSystem(engineECS::System::create<engineECS::RendererComponent>([](const engineECS::Entity& inEntity, const float deltaTime)
+		//{
+		//	std::cout << "Hello from " << inEntity.id << " entity with " << deltaTime << " delta time! (" << (deltaTime == 0.f ? -1 : 1.f / deltaTime) << ")" << std::endl;
+		//}));
+
+		world->tryAddSystem(engineECS::System::create<engineECS::TransformComponent, engineECS::RotatorComponent>([](const engineECS::Entity& inEntity, const float deltaTime)
+		{
+			engineECS::TransformComponent& transform = inEntity.getComponent<engineECS::TransformComponent>();
+			engineECS::RotatorComponent& rotator = inEntity.getComponent<engineECS::RotatorComponent>();
+			transform.rotation += engineECS::Vector3(rotator.rotationSpeed) * deltaTime;
+			std::cout << "Hello from " << inEntity.id << " entity with " << deltaTime << " delta time! (" << (deltaTime == 0.f ? -1 : 1.f / deltaTime) << ")." << transform << std::endl;
+		}));
 	}
-	engineECS::World* world = GET_ENGINE.getWorld(index);
 
-	std::cout << sizeof(SYSTEM_FUNCTION) << std::endl;
-
-	engineECS::Entity enemy001 = world->createEntity();
-	engineECS::Entity player = world->createEntity();
-	engineECS::Entity enemy002 = world->createEntity();
-
-	player.addComponent<engineECS::RendererComponent>();
-	enemy001.addComponent<engineECS::RendererComponent>();
-	enemy002.addComponent<engineECS::RendererComponent>();
-
-
-	world->destroyEntity(player);
-
-
-	world->forEachAll([](const engineECS::Entity& inEntity) 
+	while (true)
 	{
-		std::cout << "Hello from " << inEntity.id << " entity!" << std::endl;
-	});
-	world->executeSystems();
+		GET_ENGINE.run(0.01666666666f);
+	}
 
 	std::getchar();
 	return 0;

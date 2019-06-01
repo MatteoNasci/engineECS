@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-static std::ostream& operator<<(std::ostream& LHS, const engineECS::Entity& RHS)
+static std::ostream& operator<<(std::ostream& lhs, const engineECS::Entity& rhs)
 {
-	return LHS << RHS.id;
+	return lhs << rhs.id;
 }
