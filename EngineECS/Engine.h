@@ -1,5 +1,8 @@
 #pragma once
 #include <queue>
+#ifdef USE_ARRAY_WORLDS
+#include <vector>
+#endif
 
 #include "private.h"
 #include "constants.h"
@@ -35,9 +38,14 @@ namespace engineECS
 		Engine();
 		~Engine();
 
+#ifdef USE_ARRAY_WORLDS
 		World worlds[MaxWorlds];
-		WorldIndex currentWorldIndex;
+#else
+		std::vector<World> worlds;
+#endif
 		std::queue<WorldIndex> recycler;
+
+		WorldIndex currentWorldIndex;
 	};
 }
 

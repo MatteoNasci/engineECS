@@ -17,9 +17,7 @@ namespace engineECS
 		template<typename... Components>
 		void setMask()
 		{
-			EntityComponentMask mask{};
-			[&mask](...) {}(mask.mask.set(Components::getTypeId(), true)...);
-			setMask(mask);
+			[this](...) {}(this->mask.mask.set(Components::getTypeId(), true)...);
 		}
 		void setMask(const EntityComponentMask& mask);
 
@@ -36,9 +34,7 @@ namespace engineECS
 		static System create(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& inCallback)
 		{
 			System system = System(inCallback);
-			EntityComponentMask mask{};
-			[&mask](...) {}(mask.mask.set(Components::getTypeId(), true)...);
-			system.setMask(mask);
+			[&system](...) {}(system.mask.mask.set(Components::getTypeId(), true)...);
 			return system;
 		}
 	private:

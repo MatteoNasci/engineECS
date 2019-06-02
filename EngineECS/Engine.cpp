@@ -2,7 +2,11 @@
 
 void engineECS::Engine::run(const float deltaTime)
 {
+#ifdef USE_ARRAY_WORLDS
 	for (currentWorldIndex = 0; currentWorldIndex < engineECS::MaxWorlds; ++currentWorldIndex)
+#else
+	for (currentWorldIndex = 0; currentWorldIndex < worlds.size(); ++currentWorldIndex)
+#endif
 	{
 		World& world = worlds[currentWorldIndex];
 		if (world.isActive())
@@ -19,11 +23,19 @@ engineECS::Engine& engineECS::Engine::getEngine()
 }
 int engineECS::Engine::getActiveWorldsCount() const
 {
+#ifdef USE_ARRAY_WORLDS
 	return engineECS::MaxWorlds - static_cast<int>(recycler.size());
+#else
+	return static_cast<int>(worlds.size() - recycler.size());
+#endif
 }
 int engineECS::Engine::getAvailableWorldsCount() const
 {
+#ifdef USE_ARRAY_WORLDS
 	return engineECS::MaxWorlds - getActiveWorldsCount();
+#else
+	return INT32_MAX;
+#endif
 }
 WorldIndex engineECS::Engine::createWorld(WorldCreation& outResult)
 {
@@ -33,8 +45,22 @@ WorldIndex engineECS::Engine::createWorld(WorldCreation& outResult)
 		return engineECS::InvalidWorldIndex;
 	}
 
+#ifdef USE_ARRAY_WORLDS
 	WorldIndex index = recycler.front();
 	recycler.pop();
+#else
+	WorldIndex index = engineECS::InvalidWorldIndex;
+	if (recycler.empty())
+	{
+		index = static_cast<int>(worlds.size());
+		worlds.push_back(engineECS::World());
+	}
+	else
+	{
+		index = recycler.front();
+		recycler.pop();
+	}
+#endif
 
 	worlds[index].initialize(index);
 
@@ -66,7 +92,11 @@ engineECS::World* engineECS::Engine::getWorld(const WorldIndex index)
 }
 bool engineECS::Engine::tryDestroyWorld(const WorldIndex index)
 {
-	if (index >= engineECS::MaxWorlds)
+#ifdef USE_ARRAY_WORLDS
+	if (index >= engineECS::MaxWorlds || index < 0)
+#else
+	if (index >= worlds.size() || index < 0)
+#endif
 	{
 		return false;
 	}
@@ -83,11 +113,13 @@ bool engineECS::Engine::tryDestroyWorld(const WorldIndex index)
 }
 engineECS::Engine::Engine()
 {
+#ifdef USE_ARRAY_WORLDS
 	for (int i = 0; i < engineECS::MaxWorlds; ++i)
 	{
 		recycler.push(i);
 		worlds[i].deinitialize();
 	}
+#endif
 }
 engineECS::Engine::~Engine()
 {

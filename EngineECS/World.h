@@ -46,11 +46,18 @@ namespace engineECS
 		template<typename T>
 		bool tryAddComponent(const Entity& inEntity)
 		{
+#ifdef USE_ARRAY_COMPONENTS
 			if (inEntity.id >= T::getLength())
 			{
 				return false;
 			}
-
+#else
+			std::vector<T>& componentVector = T::getElements();
+			if (inEntity.id >= componentVector.size())
+			{
+				componentVector.resize(inEntity.id + 1);
+			}
+#endif
 			T::getElement(inEntity.id) = {};
 
 			int id = T::getTypeId();
@@ -77,14 +84,28 @@ namespace engineECS
 	private:
 		void forEach(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& callback, const EntityComponentMask& mask, const float deltaTime);
 
+#ifdef USE_ARRAY_ENTITIES
 		EntityComponentMask entities[MaxEntities];
+#else
+		std::vector<EntityComponentMask> entities;
+#endif
 		std::queue<int> entitiesRecycler;
 
+#ifdef USE_ARRAY_SYSTEMS
 		System systems[MaxSystems];
+#else
+		std::vector<System> systems;
+#endif
 		std::queue<int> systemsRecycler;
-		
+
 		World();
+#ifndef USE_ARRAY_WORLDS
+	public:
+#endif // !USE_ARRAY_WORLDS
 		~World();
+#ifndef USE_ARRAY_WORLDS
+	private:
+#endif // !USE_ARRAY_WORLDS
 
 		WorldIndex ownIndex;
 
