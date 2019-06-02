@@ -19,7 +19,7 @@ namespace engineECS
 		OpenGLWrapper& operator=(const OpenGLWrapper&) = delete;
 		OpenGLWrapper& operator=(OpenGLWrapper&&) = delete;
 
-		static constexpr double DefaultTargetFramePerSecond = 30.0001;
+		static constexpr double DefaultTargetFramePerSecond = 60.001;
 
 		bool shouldCloseWindow() const;
 		void SetClearColor(const float r = 0, const float g = 0, const float b = 0, const float a = 1);
