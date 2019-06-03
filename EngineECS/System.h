@@ -25,9 +25,9 @@ namespace engineECS
 		System(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& inCallback);
 		System(const std::function<void(const engineECS::Entity& inEntity, const float deltaTime)>& inCallback, const EntityComponentMask& mask);
 		System(const System&);
-		System(System&&);
+		System(System&&) noexcept;
 		System& operator=(const System&);
-		System& operator=(System&&);
+		System& operator=(System&&) noexcept;
 		~System();
 
 		template<typename... Components>

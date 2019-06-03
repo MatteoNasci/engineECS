@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Component.h"
-#include "Vector3.h"
+#include "Math.h"
 #include "constants.h"
 
 namespace engineECS
@@ -9,6 +9,6 @@ namespace engineECS
 	struct RotatorComponent : Component<RotatorComponent, MaxEntities>
 	{
 	public:
-		Vector3 rotationSpeed;
+		glm::vec3 rotationSpeed;
 	};
 }

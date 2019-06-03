@@ -3,97 +3,13 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-double engineECS::OpenGLWrapper::getStartupTime() const
-{
-	return startupTime;
-}
-double engineECS::OpenGLWrapper::getLastFrameTime() const
-{
-	return lastFrameTime;
-}
-double engineECS::OpenGLWrapper::getCurrentFrameTime() const
-{
-	return currentFrameTime;
-}
-float engineECS::OpenGLWrapper::getDeltaTime() const
-{
-	return currentDeltaTime;
-}
-float engineECS::OpenGLWrapper::getCurrentFramePerSecond() const
-{
-	return currentFramePerSecond;
-}
-float engineECS::OpenGLWrapper::getSavedFramePerSecond() const
-{
-	return savedFramePerSecond;
-}
-float engineECS::OpenGLWrapper::getSavedMaxFramePerSecond() const
-{
-	return savedMaxFramePerSecond;
-}
-float engineECS::OpenGLWrapper::getSavedMinFramePerSecond() const
-{
-	return savedMinFramePerSecond;
-}
-long long unsigned int engineECS::OpenGLWrapper::getTotalFramesCount() const
-{
-	return totalFrames;
-}
-float engineECS::OpenGLWrapper::getTotalFramePerSecond() const
-{
-	return totalFramePerSecond;
-}
-double engineECS::OpenGLWrapper::getTargetFramePerSecond() const
-{
-	return targetFramePerSecond;
-}
-void engineECS::OpenGLWrapper::setTargetFramePerSecond(const double inTargetFramePerSecond)
-{
-	targetFramePerSecond = inTargetFramePerSecond;
-}
 void engineECS::OpenGLWrapper::prepareFrame()
 {
-	++totalFrames;
-
-	lastFrameTime = currentFrameTime;
-
-	do
-	{
-		currentFrameTime = glfwGetTime();
-		currentDeltaTime = static_cast<float>(currentFrameTime - lastFrameTime);
-		currentFramePerSecond = 1.f / currentDeltaTime;
-	} while (targetFramePerSecond > 0. && currentFramePerSecond > targetFramePerSecond);
-	
-	savedDeltaTimes[savedDeltaTimesCounter] = currentDeltaTime;
-	if (++savedDeltaTimesCounter >= engineECS::OpenGLWrapper::SavedDeltaTimesCount)
-	{
-		savedDeltaTimesCounter = 0;
-	}
-
-	savedFramePerSecond = 0;
-	savedMinFramePerSecond = FLT_MAX;
-	savedMaxFramePerSecond = -FLT_MAX;
-	for (int i = 0; i < engineECS::OpenGLWrapper::SavedDeltaTimesCount; ++i)
-	{
-		const float value = savedDeltaTimes[i];
-		const float framePerSecond = 1.f / value;
-
-		if (framePerSecond > savedMaxFramePerSecond)
-		{
-			savedMaxFramePerSecond = framePerSecond;
-		}
-		if (framePerSecond < savedMinFramePerSecond)
-		{
-			savedMinFramePerSecond = framePerSecond;
-		}
-
-		savedFramePerSecond += value;
-	}
-	savedFramePerSecond = 1 / (savedFramePerSecond / static_cast<float>(engineECS::OpenGLWrapper::SavedDeltaTimesCount));
-
-	totalFramePerSecond = 1.f / static_cast<float>(((currentFrameTime - startupTime) / totalFrames));
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+double engineECS::OpenGLWrapper::getTime()
+{
+	return glfwGetTime();
 }
 bool engineECS::OpenGLWrapper::shouldCloseWindow() const
 {
@@ -111,7 +27,7 @@ void engineECS::OpenGLWrapper::finalizeFrame()
 	/* Poll for and process events */
 	glfwPollEvents();
 }
-engineECS::OpenGLWrapper::OpenGLWrapper(const char* screenTitle, const int width, const int height) : targetFramePerSecond(engineECS::OpenGLWrapper::DefaultTargetFramePerSecond)
+engineECS::OpenGLWrapper::OpenGLWrapper(const char* screenTitle, const int width, const int height) : window(nullptr)
 {
 	/* Initialize the library */
 	if (!glfwInit())
@@ -141,14 +57,9 @@ engineECS::OpenGLWrapper::OpenGLWrapper(const char* screenTitle, const int width
 
 	SetClearColor(0, 0, 0, 1);
 
-	startupTime = glfwGetTime();
-	lastFrameTime = startupTime;
-	totalFrames = 0;
-	savedDeltaTimesCounter = 0;
-	std::memset(savedDeltaTimes, 1, engineECS::OpenGLWrapper::SavedDeltaTimesCount * sizeof(float));
-	currentDeltaTime = 0.f;
+	glEnable(GL_DEPTH_TEST);
 }
-void engineECS::OpenGLWrapper::SetClearColor(const float r, const float g, const float b, const float a)
+void engineECS::OpenGLWrapper::SetClearColor(const float r, const float g, const float b, const float a) const
 {
 	glClearColor(r, g, b, a);
 }

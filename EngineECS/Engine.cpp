@@ -41,7 +41,7 @@ WorldIndex engineECS::Engine::createWorld(WorldCreation& outResult)
 {
 	if (getAvailableWorldsCount() <= 0)
 	{
-		outResult = WC_MAX_WORLD_LIMIT;
+		outResult = engineECS::WorldCreation::WC_MAX_WORLD_LIMIT;
 		return engineECS::InvalidWorldIndex;
 	}
 
@@ -111,7 +111,7 @@ bool engineECS::Engine::tryDestroyWorld(const WorldIndex index)
 	recycler.push(index);
 	return true;
 }
-engineECS::Engine::Engine()
+engineECS::Engine::Engine() : currentWorldIndex(engineECS::InvalidWorldIndex)
 {
 #ifdef USE_ARRAY_WORLDS
 	for (int i = 0; i < engineECS::MaxWorlds; ++i)

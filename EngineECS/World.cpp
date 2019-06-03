@@ -10,10 +10,12 @@ engineECS::Entity engineECS::World::createEntity(engineECS::EntityCreation& outR
 		outResult = engineECS::EntityCreation::EC_ENTITY_LIMIT;
 		return Entity(engineECS::InvalidEntityIndex);
 	}
+	outResult = engineECS::EntityCreation::EC_OK;
 	int id = entitiesRecycler.front();
 	entitiesRecycler.pop();
 	return Entity(id);
 #else
+	outResult = engineECS::EntityCreation::EC_OK;
 	int id = 0;
 	if (entitiesRecycler.empty())
 	{
@@ -106,7 +108,7 @@ bool engineECS::World::isActive() const
 {
 	return ownIndex != engineECS::InvalidWorldIndex;
 }
-engineECS::World::World()
+engineECS::World::World() : ownIndex(engineECS::InvalidWorldIndex)
 {
 	deinitialize();
 }

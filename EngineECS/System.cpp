@@ -22,7 +22,7 @@ engineECS::System::System(const engineECS::System& other) : engineECS::System::S
 {
 
 }
-engineECS::System::System(engineECS::System&& other) : engineECS::System::System(other.callback, other.mask)
+engineECS::System::System(engineECS::System&& other) noexcept : engineECS::System::System(other.callback, other.mask)
 {
 
 }
@@ -36,7 +36,7 @@ engineECS::System& engineECS::System::operator=(const engineECS::System& other)
 	mask = other.mask;
 	return *this;
 }
-engineECS::System& engineECS::System::operator=(engineECS::System&& other)
+engineECS::System& engineECS::System::operator=(engineECS::System&& other) noexcept
 {
 	callback = other.callback;
 	mask = other.mask;
