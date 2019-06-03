@@ -23,7 +23,14 @@ namespace engineECS
 		float getSavedMinFramePerSecond() const;
 		float getTotalFramePerSecond() const;
 		long long unsigned int getTotalFramesCount() const;
+
+		void setDebugOptions(const bool isEnabled, const int debugDisplayInterval = 200);
+		bool isDebugEnabled() const;
+		int getDebugDisplayInterval() const;
 	private:
+		bool debugEnabled;
+		int debugDisplayInterval;
+
 		double(*getTime)();
 
 		double targetFramePerSecond;

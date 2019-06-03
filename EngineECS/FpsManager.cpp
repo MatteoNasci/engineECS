@@ -1,8 +1,22 @@
 #include "FpsManager.h"
 
 #include <memory>
+#include <iostream>
 
-engineECS::FpsManager::FpsManager(double(*const inGetTime)()) : getTime(inGetTime)
+void engineECS::FpsManager::setDebugOptions(const bool isEnabled, const int inDebugDisplayInterval)
+{
+	debugEnabled = isEnabled;
+	debugDisplayInterval = inDebugDisplayInterval;
+}
+bool engineECS::FpsManager::isDebugEnabled() const
+{
+	return debugEnabled;
+}
+int engineECS::FpsManager::getDebugDisplayInterval() const
+{
+	return debugDisplayInterval;
+}
+engineECS::FpsManager::FpsManager(double(*const inGetTime)()) : getTime(inGetTime), debugEnabled(false), debugDisplayInterval(200)
 {
 	startupTime = getTime();
 	lastFrameTime = startupTime;
@@ -20,6 +34,14 @@ engineECS::FpsManager::FpsManager(double(*const inGetTime)()) : getTime(inGetTim
 }
 void engineECS::FpsManager::update()
 {
+	if (debugEnabled)
+	{
+		if (totalFrames % debugDisplayInterval == 0)
+		{
+			std::cout << "Current fps: " << currentFramePerSecond << ", saved: " << savedFramePerSecond << ", max: " << savedMaxFramePerSecond << ", min: " << savedMinFramePerSecond << ", total fps: " << totalFramePerSecond << " FPS." << std::endl;
+		}
+	}
+
 	++totalFrames;
 
 	lastFrameTime = currentFrameTime;

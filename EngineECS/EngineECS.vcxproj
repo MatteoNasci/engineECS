@@ -131,6 +131,7 @@
     <ClCompile Include="FpsManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="SkeletalMesh.cpp" />
     <ClCompile Include="OpenGLShader.cpp" />
     <ClCompile Include="OpenGLWrapper.cpp" />
     <ClCompile Include="RendererComponent.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="FpsManager.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="SkeletalMesh.h" />
     <ClInclude Include="OpenGLShader.h" />
     <ClInclude Include="OpenGLWrapper.h" />
     <ClInclude Include="private.h" />

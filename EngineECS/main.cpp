@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "FpsManager.h"
 #include "Mesh.h"
+#include "SkeletalMesh.h"
 #include "Math.h"
 #include "OpenGLShader.h"
 
@@ -36,20 +37,28 @@ int main(int argc, char **argv)
 		world->tryAddComponent<engineECS::TransformComponent>(player);
 		world->tryAddComponent<engineECS::TransformComponent>(enemy001);
 
-		world->tryAddComponent<engineECS::TransformComponent>(enemy002);
-		world->getComponent<engineECS::TransformComponent>(enemy002).rotation = glm::vec3(0.2f, 10.0f, -55.3f);
+		if (world->tryAddComponent<engineECS::TransformComponent>(enemy002))
+		{
+			world->getComponent<engineECS::TransformComponent>(enemy002).rotation = glm::vec3(0.2f, 10.0f, -55.3f);
+		}
 
-		world->tryAddComponent<engineECS::RotatorComponent>(enemy002);
-		world->getComponent<engineECS::RotatorComponent>(enemy002).rotationSpeed = glm::vec3(5, 1, 100);
+		if (world->tryAddComponent<engineECS::RotatorComponent>(enemy002))
+		{
+			world->getComponent<engineECS::RotatorComponent>(enemy002).rotationSpeed = glm::vec3(5, 1, 100);
+		}
 		do
 		{
 			engineECS::Entity entity = world->createEntity(result);
 			if (result == engineECS::EntityCreation::EC_OK)
 			{
-				world->tryAddComponent<engineECS::TransformComponent>(entity);
-				world->tryAddComponent<engineECS::RotatorComponent>(entity);
-				world->getComponent<engineECS::TransformComponent>(entity).rotation = glm::vec3(0.2f, 10.0f, -55.3f);
-				world->getComponent<engineECS::RotatorComponent>(entity).rotationSpeed = glm::vec3(5, 1, 100);
+				if (world->tryAddComponent<engineECS::TransformComponent>(entity))
+				{
+					world->getComponent<engineECS::TransformComponent>(entity).rotation = glm::vec3(0.2f, 10.0f, -55.3f);
+				}
+				if (world->tryAddComponent<engineECS::RotatorComponent>(entity))
+				{
+					world->getComponent<engineECS::RotatorComponent>(entity).rotationSpeed = glm::vec3(5, 1, 100);
+				}
 			}
 		} while (result == engineECS::EntityCreation::EC_OK);
 
@@ -72,6 +81,7 @@ int main(int argc, char **argv)
 
 	engineECS::FpsManager fpsManager = { &engineECS::OpenGLWrapper::getTime };
 	fpsManager.setTargetFramePerSecond(-1.);
+	fpsManager.setDebugOptions(true);
 
 	engineECS::OpenGLShader defaultSkeletalShader(R"(
 #version 410 core
@@ -187,15 +197,9 @@ void main()
 
 		wrapper.prepareFrame();
 
-		GET_ENGINE.run(fpsManager.getDeltaTime());
+		engineECS::Engine::getEngine().run(fpsManager.getDeltaTime());
 
 		wrapper.finalizeFrame();
-
-		//TODO: DEBUG to remove
-		if (fpsManager.getTotalFramesCount() % 200 == 0)
-		{
-			std::cout << "Current fps: " << fpsManager.getCurrentFramePerSecond() << ", saved: " << fpsManager.getSavedFramePerSecond() << ", max: " << fpsManager.getSavedMaxFramePerSecond() << ", min: " << fpsManager.getSavedMinFramePerSecond() << ", total fps: " << fpsManager.getTotalFramePerSecond() << " FPS." << std::endl;
-		}
 	}
 
 	return 0;
