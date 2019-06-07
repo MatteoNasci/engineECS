@@ -1,7 +1,38 @@
 #include "SkeletalMesh.h"
-
 engineECS::SkeletalMesh::SkeletalMesh() : uploaded(false), vao(), numVertices(), buffers()
 {
+
+}
+engineECS::SkeletalMesh::SkeletalMesh(const std::vector<glm::vec3>& inVertices, const std::vector<glm::vec3>& inNormals, const std::vector<glm::mat4>& inBindPoses, const std::vector<std::array<int, 4>>& inBones, const std::vector<std::array<float, 4>>& inWeights, const std::map<std::string, std::vector<std::vector<glm::mat4>>>& inAnimations) :vertices(inVertices), normals(inNormals), bindPoses(inBindPoses), bones(inBones), weights(inWeights), animations(inAnimations), uploaded(false), vao(), numVertices(), buffers()
+{
+}
+engineECS::SkeletalMesh::SkeletalMesh(const std::vector<ffh::Vector3>& inVertices, const std::vector<ffh::Vector3>& inNormals, const std::vector<ffh::Matrix4>& inBindPoses, const std::vector<std::array<int, 4>>& inBones, const std::vector<std::array<float, 4>>& inWeights, const std::map<std::string, std::vector<std::vector<ffh::Matrix4>>>& inAnimations) : bones(inBones), weights(inWeights), uploaded(false), vao(), numVertices(), buffers()
+{
+	for (const ffh::Vector3& vertex : inVertices)
+	{
+		vertices.push_back(vector3FromFFHtoGLM(vertex));
+	}
+	for (const ffh::Vector3& normal : inNormals)
+	{
+		normals.push_back(vector3FromFFHtoGLM(normal));
+	}
+	for (const ffh::Matrix4& pose : inBindPoses)
+	{
+		bindPoses.push_back(matrix4FromFFHtoGLM(pose));
+	}
+	for (const auto& anim : inAnimations)
+	{
+		std::vector<std::vector<glm::mat4>> converted;
+		for (const auto& list : anim.second)
+		{
+			std::vector<glm::mat4> matrices;
+			for (const ffh::Matrix4& data : list)
+			{
+				matrices.push_back(matrix4FromFFHtoGLM(data));
+			}
+		}
+		animations[anim.first] = converted;
+	}
 }
 void engineECS::SkeletalMesh::upload()
 {
@@ -43,6 +74,11 @@ void engineECS::SkeletalMesh::upload()
 }
 void engineECS::SkeletalMesh::cleanup()
 {
+	//glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(1);
+	//glDisableVertexAttribArray(2);
+	//glDisableVertexAttribArray(3);
+
 	glDeleteBuffers(static_cast<GLsizei>(buffers.size()), buffers.data());
 	glDeleteVertexArrays(1, &vao);
 	uploaded = false;

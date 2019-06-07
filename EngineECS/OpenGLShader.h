@@ -21,19 +21,24 @@ namespace engineECS
 		static GLuint compileShader(const std::string& shader_source, const GLenum shader_type);
 		static bool checkCompiledShader(const GLuint shader);
 		bool isProgramSuccessfullyCreated() const;
+		GLuint getProgram() const;
+		GLint getModelUniform() const;
+		GLint getViewUniform() const;
+		GLint getProjectionUniform() const;
+		GLint getBonesMatrixUniform() const;
 
+	private:
 		OpenGLShader(const std::string& vertex_source, const std::string& fragment_source, const std::string& geometry_source = "");
-
+		OpenGLShader();
 		~OpenGLShader();
 
-	protected:
 		GLuint program;
 		GLint modelUniform;
 		GLint viewUniform;
 		GLint projectionUniform;
 		GLint bonesMatrixUniform;
-
-	private:
 		bool isProgramCreated;
+
+		friend class ShaderManager;
 	};
 }

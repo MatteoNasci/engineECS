@@ -1,5 +1,6 @@
 #include "OpenGLShader.h"
 
+#include "constants.h"
 
 bool engineECS::OpenGLShader::checkCompiledShader(const GLuint shader)
 {
@@ -23,6 +24,10 @@ bool engineECS::OpenGLShader::checkCompiledShader(const GLuint shader)
 		return false;
 	}
 	return true;
+}
+engineECS::OpenGLShader::OpenGLShader() : isProgramCreated(false), projectionUniform(), program(), modelUniform(), viewUniform(), bonesMatrixUniform()
+{
+
 }
 engineECS::OpenGLShader::OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource) : isProgramCreated(false), projectionUniform(), program(), modelUniform(), viewUniform(), bonesMatrixUniform()
 {
@@ -121,6 +126,26 @@ GLuint engineECS::OpenGLShader::compileShader(const std::string& shaderSource, c
 bool engineECS::OpenGLShader::isProgramSuccessfullyCreated() const
 {
 	return isProgramCreated;
+}
+GLuint engineECS::OpenGLShader::getProgram() const
+{
+	return program;
+}
+GLint engineECS::OpenGLShader::getModelUniform() const
+{
+	return modelUniform;
+}
+GLint engineECS::OpenGLShader::getViewUniform() const
+{
+	return viewUniform;
+}
+GLint engineECS::OpenGLShader::getProjectionUniform() const
+{
+	return projectionUniform;
+}
+GLint engineECS::OpenGLShader::getBonesMatrixUniform() const
+{
+	return bonesMatrixUniform;
 }
 engineECS::OpenGLShader::~OpenGLShader()
 {

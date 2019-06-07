@@ -1,7 +1,19 @@
 #include "Mesh.h"
 
-engineECS::Mesh::Mesh() : uploaded(false), vao(), numVertices(), buffers()
+engineECS::Mesh::Mesh(const std::vector<glm::vec3>& inVertices, const std::vector<glm::vec3>& inNormals) : vertices(inVertices), normals(inNormals), uploaded(false), vao(), numVertices(), buffers()
 {
+
+}
+engineECS::Mesh::Mesh(const std::vector<ffh::Vector3>& inVertices, const std::vector<ffh::Vector3>& inNormals) : uploaded(false), vao(), numVertices(), buffers()
+{
+	for (const ffh::Vector3& vertex : inVertices)
+	{
+		vertices.push_back(vector3FromFFHtoGLM(vertex));
+	}
+	for (const ffh::Vector3& normal : inNormals)
+	{
+		normals.push_back(vector3FromFFHtoGLM(normal));
+	}
 }
 void engineECS::Mesh::upload()
 {
@@ -31,6 +43,9 @@ void engineECS::Mesh::upload()
 }
 void engineECS::Mesh::cleanup()
 {
+	//glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(1);
+
 	glDeleteBuffers(static_cast<GLsizei>(buffers.size()), buffers.data());
 	glDeleteVertexArrays(1, &vao);
 	uploaded = false;
@@ -38,4 +53,8 @@ void engineECS::Mesh::cleanup()
 engineECS::Mesh::~Mesh()
 {
 	cleanup();
+}
+engineECS::Mesh::Mesh() : uploaded(false), vao(), numVertices(), buffers()
+{
+
 }

@@ -8,7 +8,7 @@ namespace engineECS
 		static constexpr int SavedDeltaTimesCount = 30;
 		static constexpr double DefaultTargetFramePerSecond = 60.001;
 
-		FpsManager(double(*const inGetTime)());
+		FpsManager(double(*const inGetTime)(), void(*const inWaitingTargetFps)() = nullptr);
 
 		void update();
 		double getStartupTime() const;
@@ -32,6 +32,7 @@ namespace engineECS
 		int debugDisplayInterval;
 
 		double(*getTime)();
+		void(*const waitingTargetFps)();
 
 		double targetFramePerSecond;
 

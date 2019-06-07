@@ -11,6 +11,39 @@
 #include <glm/gtx/matrix_interpolation.hpp>
 #include <iostream>
 
+#include "Vector3.h"
+#include "Matrix4.h"
+
+static glm::vec3 vector3FromFFHtoGLM(const ffh::Vector3& toConvert)
+{
+	glm::vec3 result;
+	result.x = toConvert.x;
+	result.y = toConvert.y;
+	result.z = toConvert.z;
+	return result;
+}
+static glm::mat4 matrix4FromFFHtoGLM(const ffh::Matrix4& toConvert)
+{
+	return glm::mat4{
+		toConvert.data[0][0],
+		toConvert.data[0][1],
+		toConvert.data[0][2],
+		toConvert.data[0][3],
+		toConvert.data[1][0],
+		toConvert.data[1][1],
+		toConvert.data[1][2],
+		toConvert.data[1][3],
+		toConvert.data[2][0],
+		toConvert.data[2][1],
+		toConvert.data[2][2],
+		toConvert.data[2][3],
+		toConvert.data[3][0],
+		toConvert.data[3][1],
+		toConvert.data[3][2],
+		toConvert.data[3][3],
+	};
+}
+
 static std::ostream& operator<<(std::ostream& out, const glm::mat4 matrix)
 {
 	out << matrix[0][0] << " " << matrix[1][0] << " " << matrix[2][0] << " " << matrix[3][0] << std::endl;

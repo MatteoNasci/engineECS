@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <array>
+#include "Vector3.h"
 
 namespace engineECS
 {
@@ -18,12 +19,17 @@ namespace engineECS
 
 		GLsizei numVertices;
 
+		void cleanup();
+
+		void upload();
+
+	private:
+		Mesh(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals);
+		Mesh(const std::vector<ffh::Vector3>& vertices, const std::vector<ffh::Vector3>& normals);
 		Mesh();
 
 		~Mesh();
 
-		void cleanup();
-
-		void upload();
+		friend class MeshManager;
 	};
 }

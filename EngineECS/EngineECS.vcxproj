@@ -84,15 +84,15 @@
       <Optimization>MaxSpeed</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\glad\include;D:\glm\glm-master;D:\glfw-3.3.bin.WIN64\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Autodesk\FBX\FBX SDK\2019.0\include;D:\source\repos\CPP\AIV\FastFbxHandler\FastFbxHandler;D:\glad\include;D:\glm\glm-master;D:\glfw-3.3.bin.WIN64\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\glfw-3.3.bin.WIN64\glfw-3.3.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Autodesk\FBX\FBX SDK\2019.0\lib\vs2015\x64\debug;D:\source\repos\CPP\AIV\FastFbxHandler\x64\Debug;D:\glfw-3.3.bin.WIN64\glfw-3.3.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libfbxsdk-md.lib;FastFbxHandler.lib;opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,6 +131,8 @@
     <ClCompile Include="FpsManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshManager.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="SkeletalMesh.cpp" />
     <ClCompile Include="OpenGLShader.cpp" />
     <ClCompile Include="OpenGLWrapper.cpp" />
@@ -149,6 +151,8 @@
     <ClInclude Include="FpsManager.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshManager.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="SkeletalMesh.h" />
     <ClInclude Include="OpenGLShader.h" />
     <ClInclude Include="OpenGLWrapper.h" />
@@ -159,6 +163,9 @@
     <ClInclude Include="TransformComponent.h" />
     <ClInclude Include="TypeDefiner.h" />
     <ClInclude Include="World.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Running.fbx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
