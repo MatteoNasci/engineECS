@@ -8,7 +8,8 @@ namespace engineECS
 		static constexpr int SavedDeltaTimesCount = 30;
 		static constexpr double DefaultTargetFramePerSecond = 60.001;
 
-		FpsManager(double(*const inGetTime)(), void(*const inWaitingTargetFps)() = nullptr);
+		//inWaitingTargetFps is called if it is a valid pointer and if the manager update is waiting for the target fps, allowing to not waste the waiting time. The function will only be called if there is a need to wait for the target frame rate, in which case it will be called continuosly until the waiting is over. DO NOT execute, directly or indirectly, code that requires either the current deltatime or current frame per second and AVOID to execute heavy code, it may cause noticeable fps drops.
+		FpsManager(double(*const inGetTime)(), void(*const inWaitingTargetFps)(const double estimatedWaitingTimeLeft) = nullptr);
 
 		void update();
 		double getStartupTime() const;
@@ -32,7 +33,7 @@ namespace engineECS
 		int debugDisplayInterval;
 
 		double(*getTime)();
-		void(*const waitingTargetFps)();
+		void(*const waitingTargetFps)(const double estimatedWaitingTimeLeft);
 
 		double targetFramePerSecond;
 

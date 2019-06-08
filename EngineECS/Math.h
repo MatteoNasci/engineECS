@@ -13,6 +13,8 @@
 
 #include "Vector3.h"
 #include "Matrix4.h"
+#include <PxPhysicsAPI.h>
+#include "Vector2.h"
 
 static glm::vec3 vector3FromFFHtoGLM(const ffh::Vector3& toConvert)
 {
@@ -20,6 +22,21 @@ static glm::vec3 vector3FromFFHtoGLM(const ffh::Vector3& toConvert)
 	result.x = toConvert.x;
 	result.y = toConvert.y;
 	result.z = toConvert.z;
+	return result;
+}
+static glm::vec3 vector3FromPxtoGLM(const physx::PxVec3& toConvert)
+{
+	glm::vec3 result;
+	result.x = toConvert.x;
+	result.y = toConvert.y;
+	result.z = toConvert.z;
+	return result;
+}
+static glm::vec2 vector2FromFFHtoGLM(const ffh::Vector2& toConvert)
+{
+	glm::vec2 result;
+	result.x = toConvert.x;
+	result.y = toConvert.y;
 	return result;
 }
 static glm::mat4 matrix4FromFFHtoGLM(const ffh::Matrix4& toConvert)

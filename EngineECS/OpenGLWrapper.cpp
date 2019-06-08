@@ -2,6 +2,7 @@
 #include "OpenGLWrapper.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include <exception>
 
 void engineECS::OpenGLWrapper::prepareFrame()
 {
@@ -32,7 +33,7 @@ engineECS::OpenGLWrapper::OpenGLWrapper(const char* screenTitle, const int width
 	/* Initialize the library */
 	if (!glfwInit())
 	{
-		std::cerr << "Failed to initialize glfw library" << std::endl;
+		throw std::exception("Failed to initialize glfw library");
 		return;
 	}
 
@@ -45,7 +46,7 @@ engineECS::OpenGLWrapper::OpenGLWrapper(const char* screenTitle, const int width
 	window = glfwCreateWindow(width, height, screenTitle, nullptr, nullptr);
 	if (!window)
 	{
-		std::cerr << "Failed to create opengl context" << std::endl;
+		throw std::exception("Failed to create opengl context");
 		glfwTerminate();
 		return;
 	}
@@ -55,7 +56,7 @@ engineECS::OpenGLWrapper::OpenGLWrapper(const char* screenTitle, const int width
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	SetClearColor(0, 0, 0, 1);
+	SetClearColor(0, 0, 1, 1);
 
 	glEnable(GL_DEPTH_TEST);
 }

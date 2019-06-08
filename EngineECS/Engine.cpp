@@ -2,6 +2,8 @@
 
 void engineECS::Engine::run(const float deltaTime)
 {
+	physicsEngine.update(deltaTime);
+
 #ifdef USE_ARRAY_WORLDS
 	for (currentWorldIndex = 0; currentWorldIndex < engineECS::MaxWorlds; ++currentWorldIndex)
 #else
@@ -15,6 +17,14 @@ void engineECS::Engine::run(const float deltaTime)
 		}
 	}
 	currentWorldIndex = engineECS::InvalidWorldIndex;
+}
+engineECS::ShaderManager& engineECS::Engine::getShaderManager()
+{
+	return shaderManager;
+}
+engineECS::MeshManager& engineECS::Engine::getMeshManager()
+{
+	return meshManager;
 }
 engineECS::Engine& engineECS::Engine::getEngine()
 {
@@ -85,6 +95,10 @@ engineECS::World* engineECS::Engine::getCurrentWorld()
 WorldIndex engineECS::Engine::getCurrentWorldIndex() const
 {
 	return currentWorldIndex;
+}
+engineECS::PhysicsEngine& engineECS::Engine::getPhysicsEngine()
+{
+	return physicsEngine;
 }
 engineECS::World* engineECS::Engine::getWorld(const WorldIndex index)
 {

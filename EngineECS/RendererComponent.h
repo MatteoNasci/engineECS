@@ -13,9 +13,9 @@ namespace engineECS
 		int isSkeletal : 1;
 		int receivesShadow : 1;
 		int makesShadow : 1;
-		unsigned int flags1 : 12;
-		unsigned int meshType : 16; //65.536?
-		unsigned int flags2 : 16;
-		unsigned int programType : 16; //65.536?
+		unsigned int flags1 : 15;
+		unsigned int meshType : 13;//8192 //65.536?
+		unsigned int flags2 : 19;
+		unsigned int programType : 13;//8192 //65.536?
 	};
 }

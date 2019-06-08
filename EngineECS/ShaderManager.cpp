@@ -1,63 +1,45 @@
 #include "ShaderManager.h"
-#include "constants.h"
-#include <queue>
 
-bool engineECS::ShaderManager::initialized = false;
-std::queue<int> engineECS::ShaderManager::recycler;
-bool engineECS::ShaderManager::isInitialized()
-{
-	return engineECS::ShaderManager::initialized;
-}
-int engineECS::ShaderManager::addCompiledShader(const engineECS::OpenGLShader& shader, bool& outSuccess)
+bool engineECS::ShaderManager::tryAddCompiledShader(engineECS::OpenGLShader&& shader, int& outIndex)
 {
 	if (engineECS::ShaderManager::recycler.size() == 0 || !shader.isProgramSuccessfullyCreated())
 	{
-		outSuccess = false;
-		return -1;
+		outIndex = -1;
+		return false;
 	}
 
-	outSuccess = true;
-	const int newIndex = engineECS::ShaderManager::recycler.front();
+	outIndex = engineECS::ShaderManager::recycler.front();
 	engineECS::ShaderManager::recycler.pop();
 
-	getCompiledShaders()[newIndex] = shader;
-	return newIndex;
+	programs[outIndex] = shader;
+	shader.isProgramEmpty = true;
+
+	return true;
 }
-engineECS::OpenGLShader& engineECS::ShaderManager::getCompiledShader(const int index)
+const engineECS::OpenGLShader& engineECS::ShaderManager::getCompiledShader(const int index) const
 {
-	return getCompiledShaders()[index];
+	return programs[index];
 }
-int engineECS::ShaderManager::getMaxCompiledShadersCount()
+int engineECS::ShaderManager::getMaxCompiledShadersCount() const
 {
 	return engineECS::MaxUniquePrograms;
 }
-int engineECS::ShaderManager::getCompiledShadersCount()
+int engineECS::ShaderManager::getCompiledShadersCount() const
 {
 	return engineECS::MaxUniquePrograms - static_cast<int>(engineECS::ShaderManager::recycler.size());
 }
-engineECS::OpenGLShader* engineECS::ShaderManager::getCompiledShaders()
+const engineECS::OpenGLShader* engineECS::ShaderManager::getCompiledShaders() const
 {
-	static engineECS::OpenGLShader compiledShaders[engineECS::MaxUniquePrograms];
-	return compiledShaders;
+	return programs;
 }
-void engineECS::ShaderManager::initialize()
+engineECS::ShaderManager::ShaderManager()
 {
-	if (!engineECS::ShaderManager::initialized)
+	for (register int i = 0; i < engineECS::MaxUniquePrograms; ++i)
 	{
-		engineECS::ShaderManager::initialized = !engineECS::ShaderManager::initialized;
-		while (engineECS::ShaderManager::recycler.size() > 0)
-		{
-			engineECS::ShaderManager::recycler.pop();
-		}
-		for (register int i = 0; i < engineECS::MaxUniquePrograms; ++i)
-		{
-			engineECS::ShaderManager::recycler.push(i);
-		}
+		engineECS::ShaderManager::recycler.push(i);
 	}
 }
 bool engineECS::ShaderManager::tryCreateOpenglShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource, int& outProgramIndex)
 {
-	bool result;
-	outProgramIndex = addCompiledShader(engineECS::OpenGLShader(vertexSource, fragmentSource, geometrySource), result);
-		return result;
+	return tryAddCompiledShader(engineECS::OpenGLShader(vertexSource, fragmentSource, geometrySource), outProgramIndex);
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OpenGLShader.h"
-
+#include "constants.h"
 #include <queue>
 #include <string>
 
@@ -10,20 +10,17 @@ namespace engineECS
 	class ShaderManager
 	{
 	public:
-		static int addCompiledShader(const engineECS::OpenGLShader& shader, bool& outSuccess);
-		static engineECS::OpenGLShader& getCompiledShader(const int index);
-		static int getMaxCompiledShadersCount();
-		static int getCompiledShadersCount();
-		static engineECS::OpenGLShader* getCompiledShaders();
-		static bool tryCreateOpenglShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource, int& outProgramIndex);
-
-		static void initialize();
-
-		static bool isInitialized();
-
+		const engineECS::OpenGLShader& getCompiledShader(const int index) const;
+		int getMaxCompiledShadersCount() const;
+		int getCompiledShadersCount() const;
+		const engineECS::OpenGLShader* getCompiledShaders() const;
+		bool tryCreateOpenglShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource, int& outProgramIndex);
+		ShaderManager();
 	private:
-		static bool initialized;
-		static std::queue<int> recycler;
+		bool tryAddCompiledShader(engineECS::OpenGLShader&& shader, int& outIndex);
+
+		std::queue<int> recycler;
+		engineECS::OpenGLShader programs[engineECS::MaxUniquePrograms];
 	};
 }
 

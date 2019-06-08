@@ -30,6 +30,10 @@ engineECS::Entity engineECS::World::createEntity(engineECS::EntityCreation& outR
 	return Entity(id);
 #endif
 }
+engineECS::Camera& engineECS::World::getMainCamera()
+{
+	return mainCamera;
+}
 void engineECS::World::initialize(const WorldIndex inOwnIndex)
 {
 	ownIndex = inOwnIndex;

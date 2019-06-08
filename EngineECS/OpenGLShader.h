@@ -28,8 +28,12 @@ namespace engineECS
 		GLint getBonesMatrixUniform() const;
 
 	private:
-		OpenGLShader(const std::string& vertex_source, const std::string& fragment_source, const std::string& geometry_source = "");
+		OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource = "");
 		OpenGLShader();
+		OpenGLShader(OpenGLShader& other) = default;
+		OpenGLShader& operator=(OpenGLShader& other) = default;
+		OpenGLShader(OpenGLShader&& other);
+		OpenGLShader& operator=(OpenGLShader&& other);
 		~OpenGLShader();
 
 		GLuint program;
@@ -37,7 +41,8 @@ namespace engineECS
 		GLint viewUniform;
 		GLint projectionUniform;
 		GLint bonesMatrixUniform;
-		bool isProgramCreated;
+		bool isProgramCreated : 1;
+		bool isProgramEmpty : 1;
 
 		friend class ShaderManager;
 	};

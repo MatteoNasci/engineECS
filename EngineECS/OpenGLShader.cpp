@@ -17,7 +17,7 @@ bool engineECS::OpenGLShader::checkCompiledShader(const GLuint shader)
 		if (infoLog)
 		{
 			glGetShaderInfoLog(shader, maxLength, &maxLength, infoLog);
-			std::cerr << infoLog << std::endl;
+			std::cerr << "Error while compiling shader id " << shader << ", " << infoLog << std::endl;
 
 			delete[] infoLog;
 		}
@@ -25,13 +25,15 @@ bool engineECS::OpenGLShader::checkCompiledShader(const GLuint shader)
 	}
 	return true;
 }
-engineECS::OpenGLShader::OpenGLShader() : isProgramCreated(false), projectionUniform(), program(), modelUniform(), viewUniform(), bonesMatrixUniform()
+engineECS::OpenGLShader::OpenGLShader() : isProgramEmpty(true), isProgramCreated(false), projectionUniform(), program(), modelUniform(), viewUniform(), bonesMatrixUniform()
 {
 
 }
-engineECS::OpenGLShader::OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource) : isProgramCreated(false), projectionUniform(), program(), modelUniform(), viewUniform(), bonesMatrixUniform()
+engineECS::OpenGLShader::OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource, const std::string& geometrySource) : isProgramEmpty(false), isProgramCreated(false), projectionUniform(), program(), modelUniform(), viewUniform(), bonesMatrixUniform()
 {
 	program = glCreateProgram();
+
+	std::cout << "Shader creation..." << std::endl;
 
 	const GLuint vertexShader = engineECS::OpenGLShader::compileShader(vertexSource, GL_VERTEX_SHADER);
 	if (!engineECS::OpenGLShader::checkCompiledShader(vertexShader))
@@ -149,5 +151,26 @@ GLint engineECS::OpenGLShader::getBonesMatrixUniform() const
 }
 engineECS::OpenGLShader::~OpenGLShader()
 {
-	glDeleteProgram(program);
+	if (!isProgramEmpty)
+	{
+		glDeleteProgram(program);
+	}
+}
+engineECS::OpenGLShader::OpenGLShader(engineECS::OpenGLShader&& other) : isProgramEmpty(other.isProgramEmpty), isProgramCreated(other.isProgramCreated), program(other.program), modelUniform(other.modelUniform), viewUniform(other.viewUniform), projectionUniform(other.projectionUniform), bonesMatrixUniform(other.bonesMatrixUniform)
+{
+	other.isProgramEmpty = true;
+}
+engineECS::OpenGLShader& engineECS::OpenGLShader::operator=(engineECS::OpenGLShader&& other)
+{
+	isProgramEmpty = other.isProgramEmpty;
+	other.isProgramEmpty = true;
+
+	isProgramCreated = other.isProgramCreated;
+	program = other.program;
+	modelUniform = other.modelUniform;
+	viewUniform = other.viewUniform;
+	projectionUniform = other.projectionUniform;
+	bonesMatrixUniform = other.bonesMatrixUniform;
+
+	return *this;
 }

@@ -10,7 +10,7 @@
 #include "Entity.h"
 #include "System.h"
 #include "constants.h"
-
+#include "Camera.h"
 namespace engineECS 
 {
 	class Engine;
@@ -78,6 +78,7 @@ namespace engineECS
 		void executeSystems(const float deltaTime);
 		WorldIndex getWorldIndex() const;
 		bool isActive() const;
+		engineECS::Camera& getMainCamera();
 
 		friend Engine;
 
@@ -108,6 +109,7 @@ namespace engineECS
 #endif // !USE_ARRAY_WORLDS
 
 		WorldIndex ownIndex;
+		engineECS::Camera mainCamera;
 
 		void initialize(const WorldIndex ownIndex);
 		void deinitialize();

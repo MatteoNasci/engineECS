@@ -17,3 +17,7 @@ typedef int WorldIndex;
 
 #define GET_ENGINE engineECS::Engine::getEngine()
 #define GET_CURRENT_WORLD GET_ENGINE.getCurrentWorld()
+#define GET_MAIN_CAMERA GET_CURRENT_WORLD->getMainCamera()
+#define GET_SHADERMANAGER GET_ENGINE.getShaderManager()
+#define GET_MESHMANAGER GET_ENGINE.getMeshManager()
+#define GET_PHYSICSENGINE GET_ENGINE.getPhysicsEngine()

@@ -16,7 +16,7 @@ int engineECS::FpsManager::getDebugDisplayInterval() const
 {
 	return debugDisplayInterval;
 }
-engineECS::FpsManager::FpsManager(double(*const inGetTime)(), void(*const inWaitingTargetFps)()) : getTime(inGetTime), waitingTargetFps(inWaitingTargetFps), debugEnabled(false), debugDisplayInterval(200)
+engineECS::FpsManager::FpsManager(double(*const inGetTime)(), void(*const inWaitingTargetFps)(const double estimatedWaitingTimeLeft)) : getTime(inGetTime), waitingTargetFps(inWaitingTargetFps), debugEnabled(false), debugDisplayInterval(200)
 {
 	startupTime = getTime();
 	lastFrameTime = startupTime;
@@ -49,11 +49,12 @@ void engineECS::FpsManager::update()
 	currentFrameTime = getTime();
 	currentDeltaTime = static_cast<float>(currentFrameTime - lastFrameTime);
 	currentFramePerSecond = 1.f / currentDeltaTime;
+	//waiting for target fps if required
 	while (targetFramePerSecond > 0. && currentFramePerSecond > targetFramePerSecond)
 	{
 		if (waitingTargetFps)
 		{
-			waitingTargetFps();
+			waitingTargetFps((lastFrameTime + targetFramePerSecond / 60.) - currentFrameTime);
 		}
 
 		currentFrameTime = getTime();

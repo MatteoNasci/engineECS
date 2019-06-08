@@ -7,6 +7,9 @@
 #include "private.h"
 #include "constants.h"
 #include "World.h"
+#include "ShaderManager.h"
+#include "MeshManager.h"
+#include "PhysicsEngine.h"
 
 namespace engineECS
 {
@@ -34,6 +37,10 @@ namespace engineECS
 		WorldIndex getCurrentWorldIndex() const;
 		int getActiveWorldsCount() const;
 		int getAvailableWorldsCount() const;
+
+		engineECS::ShaderManager& getShaderManager();
+		engineECS::MeshManager& getMeshManager();
+		engineECS::PhysicsEngine& getPhysicsEngine();
 	private:
 		Engine();
 		~Engine();
@@ -46,6 +53,10 @@ namespace engineECS
 		std::queue<WorldIndex> recycler;
 
 		WorldIndex currentWorldIndex;
+
+		engineECS::ShaderManager shaderManager;
+		engineECS::MeshManager meshManager;
+		engineECS::PhysicsEngine physicsEngine;
 	};
 }
 
